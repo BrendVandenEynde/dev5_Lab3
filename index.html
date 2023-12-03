@@ -5,29 +5,40 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite App</title>
+    <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
-    <div id="app">
+    <div id="app" class="two-columns">
 
-        <h2>🌡️</h2>
+        <h1 id="advertising-title"></h1>
 
-        <!-- Display current weather information -->
-        <div>
-            <h3>Current Weather:</h3>
-            <p id="current-temperature">Temperature: </p>
-            <p id="current-wind-speed">Wind Speed: </p>
-            <p id="is-day">Daytime: </p>
-            <p id="rain">Rain: </p>
-            <p id="showers">Showers: </p>
-            <p id="snowfall">Snowfall: </p>
-            <p id="cloud-cover">Cloud Cover: </p>
+        <div class="column" id="weather-column">
+            <h2>🌡️</h2>
+
+            <!-- Display current weather information -->
+            <div>
+                <h3>Current Weather:</h3>
+                <p id="current-temperature">Temperature: </p>
+                <p id="apparent-temperature">Apparent Temperature: </p> <!-- Moved this line here -->
+                <p id="current-wind-speed">Wind Speed: </p>
+                <p id="is-day">Daytime: </p>
+                <p id="rain">Rain: </p>
+                <p id="showers">Showers: </p>
+                <p id="snowfall">Snowfall: </p>
+                <p id="cloud-cover">Cloud Cover: </p>
+            </div>
         </div>
 
-        <!-- Display Pokemon information -->
-        <div>
+        <div class="column" id="pokemon-column">
+            <!-- Display Pokemon information -->
             <h3>Pokemon Information:</h3>
             <p id="pokemon-name">Pokemon: </p>
             <img id="pokemon-image" alt="Pokemon Image" style="max-width: 100px; max-height: 100px;" />
+        </div>
+
+        <!-- Advertising Section -->
+        <div class="advertising-column">
+            <p id="advertising-paragraph"></p>
         </div>
 
     </div>

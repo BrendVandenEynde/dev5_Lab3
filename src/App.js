@@ -1,5 +1,3 @@
-// Import necessary modules or styles if any
-
 // Define the Weather class
 class Weather {
     constructor() {
@@ -54,7 +52,7 @@ class Weather {
           return false; // Weather data retrieval failed
         }
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching weather data:", error);
         return false; // Weather data retrieval failed
       }
     }
@@ -84,18 +82,12 @@ class Weather {
     }
   
     // Callback method when geolocation is obtained successfully
-    gotLocation(result) {
+    async gotLocation(result) {
       // Extract latitude and longitude from the result
       const x = result.coords.latitude;
       const y = result.coords.longitude;
   
       // Call the method to get weather information
-      this.getWeather(x, y);
-      this.getPokemon(); // Fetch Pokemon as well
-    }
-  
-    // Method to get weather information from the API
-    async getWeather(x, y) {
       const weatherDataRetrieved = await this.weather.getWeatherData(x, y);
   
       if (weatherDataRetrieved) {
@@ -108,42 +100,81 @@ class Weather {
         document.getElementById('showers').innerText = `Showers: ${this.weather.showers}mm`;
         document.getElementById('snowfall').innerText = `Snowfall: ${this.weather.snowfall}cm`;
         document.getElementById('cloud-cover').innerText = `Cloud Cover: ${this.weather.cloudCover}%`;
+  
+        // Fetch Pokemon based on weather conditions
+        this.getPokemon();
       }
     }
   
-    // Method to fetch a random Pokemon from the PokeAPI
     getPokemon() {
-      // Make a fetch request to the Pokemon API (PokeAPI)
-      fetch('https://pokeapi.co/api/v2/pokemon/1/') // You can change the endpoint for a different Pokemon
-        .then(response => response.json())
-        .then(data => {
-          // Log the Pokemon API response
-          console.log("Pokemon API Response:", data);
-  
-          // Check if the necessary data is available in the response
-          if (data && data.name && data.sprites && data.sprites.front_default) {
-            // Extract Pokemon details
-            const pokemonName = data.name;
-            const pokemonImage = data.sprites.front_default;
-  
-            // Display the Pokemon details on the HTML page (you may customize this part)
-            document.getElementById('pokemon-name').innerText = `Pokemon: ${pokemonName}`;
-            document.getElementById('pokemon-image').src = pokemonImage;
-  
-            // Log the extracted Pokemon details
-            console.log("Pokemon Name:", pokemonName);
-            console.log("Pokemon Image:", pokemonImage);
-          } else {
-            // Log an error if the response structure is not as expected
-            console.error("Invalid Pokemon API Response:", data);
-          }
-        })
-        .catch(error => console.log(error));
+        // Use the weather information stored in the Weather class
+        const { weatherCode, rain, snowfall, isDay } = this.weather;
+    
+        // Default Pokemon
+        let primaryPokemonEndpoint = 'https://pokeapi.co/api/v2/pokemon/1/';
+        let secondaryPokemonEndpoint = null;
+    
+        // Customize Pokemon based on weather conditions
+        if (rain > 0) {
+            // Display water Pokemon when it's raining
+            secondaryPokemonEndpoint = 'https://pokeapi.co/api/v2/pokemon/7/'; // Squirtle
+        } else if (snowfall > 0) {
+            // Display ice Pokemon when it's snowing
+            secondaryPokemonEndpoint = 'https://pokeapi.co/api/v2/pokemon/4/'; // Charmander
+        } else if (weatherCode === 800) {
+            // Display fire Pokemon when it's clear sky
+            secondaryPokemonEndpoint = 'https://pokeapi.co/api/v2/pokemon/37/'; // Vulpix
+        }
+    
+        // Check if it's nighttime
+        if (!isDay) {
+            // Display a ghost Pokemon when it's nighttime
+            primaryPokemonEndpoint = 'https://pokeapi.co/api/v2/pokemon/92/'; // Gastly
+        }
+    
+        // Make fetch requests to both Pokemon endpoints simultaneously
+        Promise.all([
+            fetch(primaryPokemonEndpoint),
+            secondaryPokemonEndpoint ? fetch(secondaryPokemonEndpoint) : Promise.resolve(null)
+        ])
+            .then(responses => Promise.all(responses.map(response => response ? response.json() : null)))
+            .then(data => {
+                // Log the Pokemon API responses
+                console.log("Primary Pokemon API Response:", data[0]);
+                console.log("Secondary Pokemon API Response:", data[1]);
+    
+                // Display the primary Pokemon details on the HTML page
+                if (data[0] && data[0].name && data[0].sprites && data[0].sprites.front_default) {
+                    const primaryPokemonName = data[0].name;
+                    const primaryPokemonImage = data[0].sprites.front_default;
+                    document.getElementById('pokemon-name').innerText = `Primary Pokemon: ${primaryPokemonName}`;
+                    document.getElementById('pokemon-image').src = primaryPokemonImage;
+                } else {
+                    console.error("Invalid Primary Pokemon API Response:", data[0]);
+                }
+    
+                // Display the secondary Pokemon details on the HTML page if it exists
+                if (data[1] && data[1].name && data[1].sprites && data[1].sprites.front_default) {
+                    const secondaryPokemonName = data[1].name;
+                    const secondaryPokemonImage = data[1].sprites.front_default;
+                    // Display the secondary Pokemon details next to the primary Pokemon
+                    const secondaryPokemonElement = document.createElement('div');
+                    secondaryPokemonElement.innerHTML = `<p>Secondary Pokemon: ${secondaryPokemonName}</p><img src="${secondaryPokemonImage}" alt="Secondary Pokemon Image" style="max-width: 100px; max-height: 100px;" />`;
+                    document.getElementById('app').appendChild(secondaryPokemonElement);
+                } else if (secondaryPokemonEndpoint) {
+                    // Log a message if the secondary endpoint was specified but no data was retrieved
+                    console.error("Invalid Secondary Pokemon API Response:", data[1]);
+                }
+            })
+            .catch(error => console.log(error));
     }
+    
+    
+    
   
     // Callback method for handling geolocation errors
     errorLocation(error) {
-      console.log(error);
+      console.error("Geolocation error:", error);
     }
   }
   
@@ -152,3 +183,8 @@ class Weather {
     const app = new App();
   });
   
+
+  // Add this inside your JavaScript code where you set up other elements
+const advertisingTitle = document.getElementById('advertising-title');
+advertisingTitle.innerText = "It's raining outside! Water Pokemon are playing. This is your chance to catch them!";
+
