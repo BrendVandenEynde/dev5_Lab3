@@ -225,38 +225,43 @@ export default class App {
         console.log("Primary Pokemon API Response:", data[0]);
         console.log("Secondary Pokemon API Response:", data[1]);
 
-        // Display the primary Pokemon details on the HTML page
-        if (
-          data[0] &&
-          data[0].name &&
-          data[0].sprites &&
-          data[0].sprites.front_default
-        ) {
-          const primaryPokemonName = data[0].name;
-          const primaryPokemonImage = data[0].sprites.front_default;
-          document.getElementById("pokemon-name").innerText = `Primary Pokemon: ${primaryPokemonName}`;
-          document.getElementById("pokemon-image").src = primaryPokemonImage;
-        } else {
-          console.error("Invalid Primary Pokemon API Response:", data[0]);
-        }
+          // Display the primary Pokemon details on the HTML page
+      if (data[0] && data[0].name && data[0].sprites && data[0].sprites.front_default) {
+        const primaryPokemonName = data[0].name;
+        const primaryPokemonImage = data[0].sprites.front_default;
 
-        // Display the secondary Pokemon details on the HTML page if it exists
-        if (
-          data[1] &&
-          data[1].name &&
-          data[1].sprites &&
-          data[1].sprites.front_default
-        ) {
-          const secondaryPokemonName = data[1].name;
-          const secondaryPokemonImage = data[1].sprites.front_default;
-          // Display the secondary Pokemon details next to the primary Pokemon
-          const secondaryPokemonElement = document.createElement("div");
-          secondaryPokemonElement.innerHTML = `<p>Secondary Pokemon: ${secondaryPokemonName}</p><img src="${secondaryPokemonImage}" alt="Secondary Pokemon Image" style="max-width: 100px; max-height: 100px;" />`;
-          document.getElementById("app").appendChild(secondaryPokemonElement);
-        } else if (secondaryPokemonEndpoint) {
-          // Log a message if the secondary endpoint was specified but no data was retrieved
-          console.error("Invalid Secondary Pokemon API Response:", data[1]);
-        }
+        // Create a container for the primary Pokemon
+        const primaryPokemonContainer = document.createElement('div');
+        primaryPokemonContainer.classList.add('pokemon-container');
+
+        // Display the primary Pokemon details inside the container
+        primaryPokemonContainer.innerHTML = `<p>Closest pokemon: ${primaryPokemonName}</p><img src="${primaryPokemonImage}" alt="Primary Pokemon Image" style="max-width: 100px; max-height: 100px;" />`;
+
+        // Append the primary Pokemon container to the 'pokemon-column' element
+        document.getElementById('pokemon-column').appendChild(primaryPokemonContainer);
+      } else {
+        console.error("Invalid Primary Pokemon API Response:", data[0]);
+      }
+
+      // Display the secondary Pokemon details on the HTML page if it exists
+      if (data[1] && data[1].name && data[1].sprites && data[1].sprites.front_default) {
+        const secondaryPokemonName = data[1].name;
+        const secondaryPokemonImage = data[1].sprites.front_default;
+
+        // Create a container for the secondary Pokemon
+        const secondaryPokemonContainer = document.createElement('div');
+        secondaryPokemonContainer.classList.add('pokemon-container');
+
+        // Display the secondary Pokemon details inside the container
+        secondaryPokemonContainer.innerHTML = `<p>Appearing near you: ${secondaryPokemonName}</p><img src="${secondaryPokemonImage}" alt="Secondary Pokemon Image" style="max-width: 100px; max-height: 100px;" />`;
+
+        // Append the secondary Pokemon container to the 'pokemon-column' element
+        document.getElementById('pokemon-column').appendChild(secondaryPokemonContainer);
+      } else if (secondaryPokemonEndpoint) {
+        // Log a message if the secondary endpoint was specified but no data was retrieved
+        console.error("Invalid Secondary Pokemon API Response:", data[1]);
+      }
+
       })
       .catch((error) => console.log(error));
   }
